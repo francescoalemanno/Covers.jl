@@ -3,9 +3,9 @@ uuid = "f8026ed9-e496-42fc-8056-5fe5b8caf6f2"
 authors = ["Francesco Alemanno <francescoalemanno710@gmail.com>"]
 version = "0.1.0"
 
+[deps]
+DefaultArrays = "bb1859e0-6c46-48fc-af17-5b269a75ae2f"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
 [compat]
 julia = "1"
-
-[deps]
-DefaultArrays = "0.1.0"
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
