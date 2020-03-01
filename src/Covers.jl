@@ -2,7 +2,7 @@ module Covers
     import Base.size
     import Base.getindex
     import Base.setindex!
-    using SparseArrays
+    using DefaultArrays
     export Cover, twicecovered
 
     struct Cover{N} <: AbstractArray{Bool,N}
@@ -37,7 +37,7 @@ module Covers
     end
 
     @inline function twicecovered(A::Cover)
-        ret=spzeros(Bool,A.size...)
+        ret=DefaultArray(false,A.size)
         for t in eachindex(A)
             ret[t]=A[Tuple(t)]>1
         end
