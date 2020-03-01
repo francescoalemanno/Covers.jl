@@ -20,6 +20,10 @@ module Covers
             throw(BoundsError)
         end
     end
+    @inline function getindex(A::Cover,i::Int) 
+        I=CartesianIndices(A)[i]
+        A[I]
+    end
     @inline function Base.getindex(A::Cover, I::Int...) 
         @boundscheck boundscheck(A,I)
         any(A.cov[i][I[i]] for i in eachindex(I))
