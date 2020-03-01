@@ -32,9 +32,13 @@ module Covers
         @boundscheck boundscheck(A,I)
         sum(A.cov[i][I[i]] for i in eachindex(I))
     end
-    @inline function Base.setindex!(A::Cover, v::Bool, i,j) 
-        A.cov[i][j]=v
+    @inline function Base.setindex!(A::Cover, args...) 
+        error("Undefined operation, the syntax to update a cover is Cover(dimension,index,state=T or F)")
     end
+    function (C::Cover)(dim::Int,i::Int,state::Bool) 
+        C.cov[dim][i]=state
+    end
+
 
     @inline function twicecovered(A::Cover)
         ret=DefaultArray(false,A.size)
