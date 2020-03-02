@@ -2,6 +2,7 @@ module Covers
     import Base.size
     import Base.getindex
     import Base.setindex!
+
     using DefaultArrays
     export Cover, multicovered, ncovered
 
@@ -15,14 +16,9 @@ module Covers
     size(A::Cover) = A.size
 
 
-    @inline function boundscheck(A::Cover,I)
-        if length(I) != length(A.size) || (!all(I .<= A.size))
-            throw(BoundsError)
-        end
-    end
-    getindex(A::Cover{1}, i::Int) = _cartesian_getindex(A, i)
-    getindex(A::Cover{N}, i::Int) where N = _scalar_getindex(A, i)
-    getindex(A::Cover{N}, I::Int...) where N = _cartesian_getindex(A, I...)
+    @inline getindex(A::Cover{1}, i::Int) = _cartesian_getindex(A, i)
+    @inline getindex(A::Cover{N}, i::Int) where N = _scalar_getindex(A, i)
+    @inline getindex(A::Cover{N}, I::Int...) where N = _cartesian_getindex(A, I...)
 
     @inline function _scalar_getindex(A::Cover,i::Int)
         I=CartesianIndices(A)[i]
@@ -30,17 +26,21 @@ module Covers
     end
 
 
-    @inline function _cartesian_getindex(A::Cover, I::Int...)
-        @boundscheck boundscheck(A,I)
-        any(A.cov[i][I[i]] for i in eachindex(I))
+    @inline function _cartesian_getindex(A::Cover{N}, I::Int...) where N
+        @boundscheck checkbounds(CartesianIndices(A),I...)
+        for i in 1:N
+            if A.cov[i][I[i]]
+                return true
+            end
+        end
+        return false
     end
 
-    setindex!(A::Cover{1}, v::Bool, i::Int) = _cartesian_setindex!(A, v, i)
-    setindex!(A::Cover{N}, v::Bool, i::Int) where N = _scalar_setindex!(A, v, i)
-    setindex!(A::Cover{N}, v::Bool, I::Int...) where N = _cartesian_setindex!(A, v, I...)
+    @inline setindex!(A::Cover{1}, v::Bool, i::Int) = _cartesian_setindex!(A, v, i)
+    @inline setindex!(A::Cover{N}, v::Bool, i::Int) where N = _scalar_setindex!(A, v, i)
+    @inline setindex!(A::Cover{N}, v::Bool, I::Int...) where N = _cartesian_setindex!(A, v, I...)
 
     @inline function _cartesian_setindex!(A::Cover{N}, v::Bool,I::Int...) where N
-        @boundscheck boundscheck(A,I)
         state=A[I...]
         if v && !state
             idx=findmax(size(A))[2]
@@ -61,7 +61,7 @@ module Covers
         _cartesian_setindex!(A::Cover,v, Tuple(I)...)
     end
 
-    function (C::Cover)(dim::Int,i::Int,state::Bool)
+    @inline function (C::Cover)(dim::Int,i::Int,state::Bool)
         C.cov[dim][i]=state
     end
 
@@ -75,7 +75,7 @@ module Covers
 
 
     @inline function coveredntimes(A::Cover{N}, I::NTuple{N,Int}) where N
-        @boundscheck boundscheck(A,I)
+        @boundscheck checkbounds(CartesianIndices(A),I...)
         sum(A.cov[i][I[i]] for i in eachindex(I))
     end
 
