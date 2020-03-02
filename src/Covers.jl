@@ -3,7 +3,7 @@ module Covers
     import Base.getindex
     import Base.setindex!
     using DefaultArrays
-    export Cover, twicecovered
+    export Cover, multicovered, ncovered
 
     struct Cover{N} <: AbstractArray{Bool,N}
         size::NTuple{N,Int}
@@ -65,10 +65,10 @@ module Covers
         C.cov[dim][i]=state
     end
 
-    @inline function twicecovered(A::Cover)
+    @inline function multicovered(A::Cover)
         ret=DefaultArray(false,A.size)
         for t in eachindex(A)
-            ret[t]=A[Tuple(t)]>1
+            ret[t]=coveredntimes(A, Tuple(t))>1
         end
         ret
     end
