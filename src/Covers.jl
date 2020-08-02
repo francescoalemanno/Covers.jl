@@ -11,7 +11,7 @@ module Covers
         cov::Vector{BitArray{1}}
     end
 
-    Cover(size::Int...) where N =Cover(size,[falses(s) for s in size])
+    Cover(size::Int...) = Cover(size,[falses(s) for s in size])
 
     size(A::Cover) = A.size
 
